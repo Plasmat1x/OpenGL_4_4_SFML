@@ -1,0 +1,22 @@
+ninja: Entering directory `/home/plasmat1x/projects/OpenGL/build'
+[1/2] Compiling C++ object src/ogl.p/Shader.cpp.o
+../src/Shader.cpp: In constructor ‘Shader::Shader(std::string, std::string, std::string)’:
+../src/Shader.cpp:7:22: warning: the address of ‘geometryPath’ will never be NULL [-Waddress]
+    7 |     if(&geometryPath != nullptr)
+      |        ~~~~~~~~~~~~~~^~~~~~~~~~
+../src/Shader.cpp:3:78: note: ‘geometryPath’ declared here
+    3 | Shader::Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath)
+      |                                                                  ~~~~~~~~~~~~^~~~~~~~~~~~
+../src/Shader.cpp: In lambda function:
+../src/Shader.cpp:35:39: warning: catching polymorphic type ‘class std::ios_base::failure’ by value [-Wcatch-value=]
+   35 |         catch (std::ifstream::failure e)
+      |                                       ^
+../src/Shader.cpp: In lambda function:
+../src/Shader.cpp:67:39: warning: catching polymorphic type ‘class std::ios_base::failure’ by value [-Wcatch-value=]
+   67 |         catch (std::ifstream::failure e)
+      |                                       ^
+../src/Shader.cpp: In lambda function:
+../src/Shader.cpp:102:43: warning: catching polymorphic type ‘class std::ios_base::failure’ by value [-Wcatch-value=]
+  102 |             catch (std::ifstream::failure e)
+      |                                           ^
+[2/2] Linking target src/ogl

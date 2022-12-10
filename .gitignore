@@ -3,3 +3,5 @@
 ./include/GLFW/
 ./include/KHR/
 ./src/glad.c
+./build
+./.vscode

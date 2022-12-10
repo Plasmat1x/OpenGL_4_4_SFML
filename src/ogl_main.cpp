@@ -1,20 +1,29 @@
 #include<GL/glew.h>
 #include<SFML/Window.hpp>
+#include<SFML/System.hpp>
 
 #include<printf.h>
+#include<chrono>
+#include<math.h>
 
-//int main(int argc, char **argv)
+#include"Shader.h"
+
+bool frameDrawingMode = false;
+
 int main()  
 {
+
+    Shader shdBase("vertex.glsl", "fragment.glsl");
+//--------------------------------------------------------------
     sf::ContextSettings settings;
     settings.depthBits = 24;
     settings.stencilBits = 8;
-    settings.antialiasingLevel = 4; // Optional
-    settings.majorVersion = 3;
+    settings.antialiasingLevel = 4;
+    settings.majorVersion = 4;
     settings.minorVersion = 3;
     settings.attributeFlags = sf::ContextSettings::Core;
 
-    sf::Window window(sf::VideoMode(800,600), "OpenGL 4.4", sf::Style::Default, settings);
+    sf::Window window(sf::VideoMode(800,600), "OpenGL 4.3", sf::Style::Close, settings);
 
     window.setVerticalSyncEnabled(false);
 
@@ -31,71 +40,36 @@ int main()
     glViewport(0,0,800,600);
 //--------------------------------------------------------------
 
-    //https://learnopengl.com/Getting-started/Hello-Triangle
     //init geometry
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f, 0.5f, 0.0f
+        //pos               //color
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,            
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,            
+         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
     };
 
-    //vert shd
-    const char* vertexShaderSorce = R"(#version 330 core
-    layout (location = 0) in vec3 aPos;
-    void main()
-    {
-        gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
-    })";
-
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSorce, NULL);
-    glCompileShader(vertexShader);
-
-    //frag shd
-    const char* fragmentShaderSource = R"(#version 330 core
-    out vec4 FragColor;
-    void main()
-    {
-        FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-    })";
-
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    //shd prog
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glUseProgram(shaderProgram);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    //VBO
+    //setup buffers
     unsigned int VBO;
-    glGenBuffers(1,&VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    //VAO
     unsigned int VAO;
+
     glGenVertexArrays(1, &VAO);
+    glGenBuffers(1,&VBO);
+    
     glBindVertexArray(VAO);
 
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 3*sizeof(float), (void*)0);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);
+
+    //pos attrib
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE, 6*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    //color attrib
+    glVertexAttribPointer(1,3,GL_FLOAT,GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    shdBase.Use();
 
 //--------------------------------------------------------------
     while (window.isOpen())
@@ -112,44 +86,35 @@ int main()
             case sf::Event::Resized:
                 glViewport(0,0,window.getSize().x, window.getSize().y);
                 break;
+
             default:
                 break;
             }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
-            window.close();
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
+                window.close();
+
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tilde))
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
-        
+//--------------------------------------------------------------
         glClearColor(0.5,0.5,0.5,1);
         glClear(GL_COLOR_BUFFER_BIT);
 //--------------------------------------------------------------
-        //modif data in buffers
-        glBindBuffer(GL_ARRAY_BUFFER,VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0,3,GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
-
+        
         //drawing
-        glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0,3);
-
-
-
-
-
-
-
-
-
-
-
-       
+        glDrawArrays(GL_TRIANGLES, 0,3);   
+  
 //--------------------------------------------------------------
         window.display();
     }
     
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+
     return 0;
 }
