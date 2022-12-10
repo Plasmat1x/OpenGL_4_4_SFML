@@ -12,8 +12,6 @@ bool frameDrawingMode = false;
 
 int main()  
 {
-
-    Shader shdBase("vertex.glsl", "fragment.glsl");
 //--------------------------------------------------------------
     sf::ContextSettings settings;
     settings.depthBits = 24;
@@ -39,6 +37,8 @@ int main()
 
     glViewport(0,0,800,600);
 //--------------------------------------------------------------
+
+    Shader shdBase("vertex.glsl", "fragment.glsl");
 
     //init geometry
     float vertices[] = {
