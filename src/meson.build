@@ -1,7 +1,8 @@
 ogl_src = [
     'ogl_main.cpp',
     'Shader.h',
-    'Shader.cpp'
+    'Shader.cpp',
+    'stb_image.h'
 ]
 
 
