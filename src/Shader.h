@@ -6,12 +6,11 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <thread>
 
 class Shader
 {
 public:
-    Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
+    Shader(const char* vertexPath, const char* fragmentPath);
     ~Shader();
 
     void Use();
