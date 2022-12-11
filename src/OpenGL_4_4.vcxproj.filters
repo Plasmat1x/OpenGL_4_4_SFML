@@ -47,5 +47,17 @@
     <None Include="light.vertex.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="fong.vertex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fong.fragment.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="guro.vertex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="guro.fragment.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

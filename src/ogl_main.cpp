@@ -52,7 +52,7 @@ int main()
 
     //--------------------------------------------------------------
 
-    Shader shdBase("vertex.glsl", "fragment.glsl");
+    Shader baseShd("vertex.glsl", "fragment.glsl");
     Shader lightShd("light.vertex.glsl", "light.fragment.glsl");
 
     glm::vec3 lightPos = glm::vec3(1.2f, 1.f, 2.f);
@@ -218,22 +218,38 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //--------------------------------------------------------------
         
-        lightPos.x = (cos(time.asSeconds() * glm::radians(150.0f)));
-        lightPos.y = (sin(time.asSeconds() * glm::radians(150.0f)));
-        lightPos.z = (cos(time.asSeconds() * glm::radians(150.0f)) + sin(time.asSeconds() * glm::radians(150.0f)));
-        
+        lightPos.x = (cos(time.asSeconds() * glm::radians(50.0f)));
+        lightPos.y = (sin(time.asSeconds() * glm::radians(50.0f)));
+        lightPos.z = (cos(time.asSeconds() * glm::radians(50.0f)) + sin(time.asSeconds() * glm::radians(50.0f)));
+
+        //lightPos = glm::vec3(1.2f, 1.0f, 2.0f);
+
         //lighting
-        shdBase.Use();
-        shdBase.setVec3("objectColor", 1.f, .5f, .31f);
-        shdBase.setVec3("lightColor", 1.f, 1.f, 1.f);
-        shdBase.setVec3("lightPos", lightPos);
-        shdBase.setVec3("viewPos", camera.Position);
+        baseShd.Use();
+        baseShd.setVec3("light.position", lightPos);
+        baseShd.setVec3("viewPos", camera.Position);
+
+        glm::vec3 lightColor;
+        lightColor.x = (sin(time.asSeconds() + 2.f));
+        lightColor.y = (sin(time.asSeconds() + .7f));
+        lightColor.z = (sin(time.asSeconds() + 1.3f));
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+        baseShd.setVec3("light.ambient", ambientColor);
+        baseShd.setVec3("light.diffuse", diffuseColor);
+        baseShd.setVec3("light.specular", glm::vec3(1.f, 1.f, 1.f));
+
+        baseShd.setVec3("material.ambient", glm::vec3(1.f, .5f, .31f));
+        baseShd.setVec3("material.diffuse", glm::vec3(1.f, .5f, .31f));
+        baseShd.setVec3("material.specular", glm::vec3(.5f, .5f, .5f));
+        baseShd.setFloat("material.shininess", 32.f);
+     
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)800 / (float)600, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        shdBase.setMat4("projection", projection);
-        shdBase.setMat4("view", view);
+        baseShd.setMat4("projection", projection);
+        baseShd.setMat4("view", view);
         glm::mat4 model = glm::mat4(1.0f);
-        shdBase.setMat4("model", model);
+        baseShd.setMat4("model", model);
         glBindVertexArray(cubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //--------------------------------------------------------------
@@ -242,14 +258,7 @@ int main()
         lightShd.setMat4("projection", projection);
         lightShd.setMat4("view", view);
         model = glm::mat4(1.0f);
-
-        model = glm::translate(model, glm::vec3(
-            cos(time.asSeconds() * glm::radians(150.0f)),
-            sin(time.asSeconds() * glm::radians(150.0f)),
-            cos(time.asSeconds() * glm::radians(150.0f)) + sin(time.asSeconds() * glm::radians(150.0f))
-        ));
-
-        //model = glm::translate(model, lightPos);
+        model = glm::translate(model, lightPos);
         model = glm::scale(model, glm::vec3(.2f));      
         lightShd.setMat4("model", model);
         glBindVertexArray(lightCubeVAO);

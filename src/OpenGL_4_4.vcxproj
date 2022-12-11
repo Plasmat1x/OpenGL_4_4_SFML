@@ -21,7 +21,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="fong.fragment.glsl" />
+    <None Include="fong.vertex.glsl" />
     <None Include="fragment.glsl" />
+    <None Include="guro.fragment.glsl" />
+    <None Include="guro.vertex.glsl" />
     <None Include="light.fragment.glsl" />
     <None Include="light.vertex.glsl" />
     <None Include="vertex.glsl" />
