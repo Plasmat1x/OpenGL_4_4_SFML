@@ -14,6 +14,7 @@
 #include<math.h>
 
 #include"Shader.h"
+#include"Camera.h"
 
 bool frameDrawingMode = false;
 
@@ -50,7 +51,6 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     glViewport(0, 0, 800, 600);
-
 
     //--------------------------------------------------------------
 
@@ -213,6 +213,11 @@ int main()
     window.setMouseCursorGrabbed(true);
     window.setMouseCursorVisible(true);
 
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    float lastX = 400.0f;
+    float lastY = 300.0f;
+    bool firstMouse = true;
+
     while (window.isOpen())
     {
         time = clock.getElapsedTime();
@@ -229,48 +234,51 @@ int main()
                 case sf::Event::Closed:
                 {
                     window.close();
-                    break;
                 }
+                break;
                 case sf::Event::Resized:
                 {
                     glViewport(0, 0, window.getSize().x, window.getSize().y);
-                    break;
                 }
+                break;
                 case sf::Event::MouseMoved:
                 {
-                    std::cout << "     \r";
+                    float sens = 2.0f;
+                    float xpos = 0;
+                    float ypos = 0;
 
                     if(sf::Mouse::getPosition(window).x >= 401)
                     {
-                        //move camera right
-                        std::cout << "right\r";
+                        xpos = sens;
                     }
                     else if(sf::Mouse::getPosition(window).x <= 399) 
                     {
-                        //move camera left
-                        std::cout << "left \r";
+                        xpos = -sens;
                     }
 
                     if(sf::Mouse::getPosition(window).y >= 301)
                     {
-                        //move camera down
-                        std::cout << "down \r";
+                        ypos = -sens;
                     }
                     else if(sf::Mouse::getPosition(window).y <= 299)
                     {
-                        //move camera up
-                        std::cout << "up   \r";
+                        ypos = sens;
                     }
-
+                    camera.ProcessMouseMovent(xpos, ypos, true);
                     sf::Mouse::setPosition(sf::Vector2i(400,300), window);
-                    break;
                 }
+                break;
+                case sf::Event::MouseWheelScrolled:
+                {
+                    float sens = 5.0f;
+                    
+                    camera.processMouseScroll((float)windowEvent.mouseWheelScroll.delta * sens);
+                }
+                break;
                 default:
                     break;
             }
         }
-
-        const float cameraSpeed = 2.5f * deltaTime;
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Escape))
             window.close();
@@ -281,22 +289,21 @@ int main()
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
-            cameraPos += cameraSpeed * cameraFront;
+            camera.processKeyboard(FORWARD, deltaTime);   
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-            cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            camera.processKeyboard(LEFT, deltaTime);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
-            cameraPos -= cameraSpeed * cameraFront;
+            camera.processKeyboard(BACKWARD, deltaTime);
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
-            cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            camera.processKeyboard(RIGHT, deltaTime);
 
         //--------------------------------------------------------------
 
-        glm::vec3 direction;
-        direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        direction.y = sin(glm::radians(pitch));
-        direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
 
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        view = camera.GetViewMatrix();
 
         shdBase.setMat4("model", model);
         shdBase.setMat4("view", view);
