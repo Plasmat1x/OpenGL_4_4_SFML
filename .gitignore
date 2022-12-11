@@ -1,7 +1,10 @@
-.*
-./include/glad/
-./include/GLFW/
-./include/KHR/
-./src/glad.c
-./build
-./.vscode
+/.*
+/include/glad/
+/include/GLFW/
+/include/KHR/
+/src/glad.c
+/build
+/.vscode
+/.bin
+/bin
+/bin
