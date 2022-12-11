@@ -41,5 +41,11 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\.gitignore" />
+    <None Include="light.fragment.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="light.vertex.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

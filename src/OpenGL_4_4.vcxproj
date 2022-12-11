@@ -22,6 +22,8 @@
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include="fragment.glsl" />
+    <None Include="light.fragment.glsl" />
+    <None Include="light.vertex.glsl" />
     <None Include="vertex.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
