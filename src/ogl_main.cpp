@@ -11,6 +11,7 @@
 #include<stdio.h>
 #include<chrono>
 #include<math.h>
+#include<string>
 
 #include"Shader.h"
 #include"Camera.h"
@@ -251,6 +252,13 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         //--------------------------------------------------------------
         
+        glm::vec3 pointLightColors[] = {
+    glm::vec3(0.2f, 0.2f, 0.6f),
+    glm::vec3(0.3f, 0.3f, 0.7f),
+    glm::vec3(0.0f, 0.0f, 0.3f),
+    glm::vec3(0.4f, 0.4f, 0.4f)
+        };
+
         lightPos.x = (cos(time.asSeconds() * glm::radians(50.0f)));
         lightPos.y = (sin(time.asSeconds() * glm::radians(50.0f)));
         lightPos.z = (cos(time.asSeconds() * glm::radians(50.0f)) + sin(time.asSeconds() * glm::radians(50.0f)));
@@ -259,38 +267,93 @@ int main()
 
         //lighting
         baseShd.Use();
-        baseShd.setVec3("light.position", camera.Position);
-        baseShd.setVec3("light.direction", camera.Front);
-        baseShd.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
-        baseShd.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
         baseShd.setVec3("viewPos", camera.Position);
-
-        baseShd.setVec3("light.ambient", glm::vec3(.1f, .1f, .1f));
-        baseShd.setVec3("light.diffuse", glm::vec3(.8f, .8f, .8f));
-        baseShd.setVec3("light.specular", glm::vec3(1.f, 1.f, 1.f));
-        baseShd.setFloat("light.constant", 1.0f);
-        baseShd.setFloat("light.linear", 0.09f);
-        baseShd.setFloat("light.quadratic", 0.032f);
-
         baseShd.setFloat("material.shininess", 32.f);
-     
+
+        /*
+           Here we set all the uniforms for the 5/6 types of lights we have. We have to set them manually and index
+           the proper PointLight struct in the array to set each uniform variable. This can be done more code-friendly
+           by defining light types as classes and set their values in there, or by using a more efficient uniform approach
+           by using 'Uniform buffer objects', but that is something we'll discuss in the 'Advanced GLSL' tutorial.
+        */
+        // directional light
+        baseShd.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+        baseShd.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+        baseShd.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+        baseShd.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+
+        // Directional light
+        glUniform3f(glGetUniformLocation(baseShd.ID, "dirLight.direction"), -0.2f, -1.0f, -0.3f);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "dirLight.ambient"), 0.05f, 0.05f, 0.1f);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "dirLight.diffuse"), 0.2f, 0.2f, 0.7);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "dirLight.specular"), 0.7f, 0.7f, 0.7f);
+        // Point light 1                 baseShd ID
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[0].ambient"), pointLightColors[0].x * 0.1, pointLightColors[0].y * 0.1, pointLightColors[0].z * 0.1);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[0].diffuse"), pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[0].specular"), pointLightColors[0].x, pointLightColors[0].y, pointLightColors[0].z);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[0].constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[0].linear"), 0.09);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[0].quadratic"), 0.032);
+        // Point light 2                 baseShd ID
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[1].position"), pointLightPositions[1].x, pointLightPositions[1].y, pointLightPositions[1].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[1].ambient"), pointLightColors[1].x * 0.1, pointLightColors[1].y * 0.1, pointLightColors[1].z * 0.1);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[1].diffuse"), pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[1].specular"), pointLightColors[1].x, pointLightColors[1].y, pointLightColors[1].z);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[1].constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[1].linear"), 0.09);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[1].quadratic"), 0.032);
+        // Point light 3                 baseShd ID
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[2].position"), pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[2].ambient"), pointLightColors[2].x * 0.1, pointLightColors[2].y * 0.1, pointLightColors[2].z * 0.1);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[2].diffuse"), pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[2].specular"), pointLightColors[2].x, pointLightColors[2].y, pointLightColors[2].z);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[2].constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[2].linear"), 0.09);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[2].quadratic"), 0.032);
+        // Point light 4                 baseShd ID
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[3].position"), pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[3].ambient"), pointLightColors[3].x * 0.1, pointLightColors[3].y * 0.1, pointLightColors[3].z * 0.1);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[3].diffuse"), pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "pointLights[3].specular"), pointLightColors[3].x, pointLightColors[3].y, pointLightColors[3].z);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[3].constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[3].linear"), 0.09);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "pointLights[3].quadratic"), 0.032);
+        // SpotLight                     baseShd ID
+        glUniform3f(glGetUniformLocation(baseShd.ID, "spotLight.position"), camera.Position.x, camera.Position.y, camera.Position.z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "spotLight.direction"), camera.Front.x, camera.Front.y, camera.Front.z);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "spotLight.ambient"), 0.0f, 0.0f, 0.0f);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "spotLight.diffuse"), 1.0f, 1.0f, 1.0f);
+        glUniform3f(glGetUniformLocation(baseShd.ID, "spotLight.specular"), 1.0f, 1.0f, 1.0f);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "spotLight.constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "spotLight.linear"), 0.009);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "spotLight.quadratic"), 0.0032);
+        glUniform1f(glGetUniformLocation(baseShd.ID, "spotLight.cutOff"), glm::cos(glm::radians(10.0f)));
+        glUniform1f(glGetUniformLocation(baseShd.ID, "spotLight.outerCutOff"), glm::cos(glm::radians(12.5f)));
+        // == ==============================================================================================
+
+        // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)800 / (float)600, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         baseShd.setMat4("projection", projection);
         baseShd.setMat4("view", view);
 
+        // world transformation
         glm::mat4 model = glm::mat4(1.0f);
         baseShd.setMat4("model", model);
 
+        // bind diffuse map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, diffuseMap);
+        // bind specular map
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap);
 
-
+        // render containers
         glBindVertexArray(cubeVAO);
         for (unsigned int i = 0; i < 10; i++)
         {
+            // calculate the model matrix for each object and pass it to shader before drawing
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
             float angle = 20.0f * i;
@@ -299,21 +362,24 @@ int main()
 
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
-    //--------------------------------------------------------------
-        //lightCube 
-        /*
+
+        // also draw the lamp object(s)
         lightShd.Use();
         lightShd.setMat4("projection", projection);
         lightShd.setMat4("view", view);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(.2f));      
-        lightShd.setMat4("model", model);
-        glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        */
 
-    //--------------------------------------------------------------
+        // we now draw as many light bulbs as we have point lights.
+        glBindVertexArray(lightCubeVAO);
+        for (unsigned int i = 0; i < 4; i++)
+        {
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, pointLightPositions[i]);
+            model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
+            lightShd.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+
         window.display();
     }
 
