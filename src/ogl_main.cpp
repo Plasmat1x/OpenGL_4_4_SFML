@@ -50,6 +50,7 @@ int main()
     window.setActive(true);
 
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     glViewport(0, 0, 800, 600);
 
@@ -162,9 +163,9 @@ int main()
 
         glm::mat4 model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	
-        model = glm::rotate(model, cos(time.asSeconds() * glm::radians(25.f)), glm::vec3(0.f, -1.f, 0.f));
+        model = glm::rotate(model, time.asSeconds() * glm::radians(25.f), glm::vec3(0.f, -1.f, 0.f));
         baseShd.setMat4("model", model);
 
         ourmodel.Draw(baseShd);
